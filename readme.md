@@ -22,21 +22,6 @@ This project replicates the basic layout and design of YouTube for learning purp
 
 ---
 
-## 📁 Project Structure
-
-youtube-html/
-├── index.html
-├── player.html
-├── /images
-│ ├── youtube_logo.png
-│ ├── youtube_logo.webp
-| ├── channel_profile.jpg
-│ └── ...
-└── README.md
-
-
----
-
 ## 💻 Getting Started
 
 1. **Clone the repository**
