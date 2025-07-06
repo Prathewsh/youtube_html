@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Clone</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Roboto Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --yt-red: #ff0000;
+            --yt-dark: #0f0f0f;
+            --yt-light-dark: #272727;
+            --yt-light-gray: #f1f1f1;
+            --yt-text-primary: #f1f1f1;
+            --yt-text-secondary: #aaa;
+            --yt-header-height: 56px;
+            --yt-sidebar-width: 240px;
+            --yt-sidebar-collapsed-width: 72px;
+        }
+        
+        body {
+            background-color: var(--yt-dark);
+            color: var(--yt-text-primary);
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--yt-header-height);
+            background-color: var(--yt-dark);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            z-index: 1000;
+            border-bottom: 1px solid #303030;
+            justify-content: space-between;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            min-width: 180px;
+        }
+        
+        .menu-icon {
+            padding: 8px;
+            margin-right: 16px;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        
+        .menu-icon:hover {
+            background-color: #303030;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            color: var(--yt-red);
+            font-size: 2rem;
+            margin-right: 4px;
+        }
+        
+        .logo-text {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            font-size: 1.5rem;
+            margin-left: -4px;
+        }
+        
+        .header-center {
+            display: flex;
+            flex-grow: 1;
+            max-width: 640px;
+            margin: 0 40px;
+        }
+        
+        .search-bar {
+            display: flex;
+            flex-grow: 1;
+        }
+        
+        .search-input {
+            width: 100%;
+            background-color: #121212;
+            border: 1px solid #303030;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px 0 0 20px;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .search-input:focus {
+            border-color: #1c62b9;
+            background-color: #121212;
+            box-shadow: inset 0 0 0 1px #1c62b9;
+        }
+        
+        .search-button {
+            background-color: #303030;
+            border: 1px solid #303030;
+            border-left: none;
+            border-radius: 0 20px 20px 0;
+            padding: 8px 20px;
+            cursor: pointer;
+            width: 64px;
+        }
+        
+        .voice-search {
+            background-color: #181818;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 180px;
+            justify-content: flex-end;
+        }
+        
+        .header-icon {
+            font-size: 1.5rem;
+            color: var(--yt-text-primary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+        }
+        
+        .header-icon:hover {
+            background-color: #303030;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #555;
+            cursor: pointer;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-top: var(--yt-header-height);
+            display: flex;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--yt-sidebar-width);
+            background-color: var(--yt-dark);
+            height: calc(100vh - var(--yt-header-height));
+            position: fixed;
+            overflow-y: auto;
+            padding: 12px 0;
+            transition: width 0.2s;
+            z-index: 900;
+        }
+        
+        body.collapsed-sidebar .sidebar {
+            width: var(--yt-sidebar-collapsed-width);
+        }
+        
+        body.collapsed-sidebar .sidebar-item span {
+            display: none;
+        }
+        
+        body.collapsed-sidebar .sidebar-section-title {
+            display: none;
+        }
+        
+        body.collapsed-sidebar .sidebar hr {
+            margin: 8px 12px;
+        }
+        
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 24px;
+            cursor: pointer;
+            border-radius: 10px;
+            margin: 0 8px;
+            white-space: nowrap;
+        }
+        
+        .sidebar-item:hover {
+            background-color: #303030;
+        }
+        
+        .sidebar-item.active {
+            background-color: #303030;
+            font-weight: 500;
+        }
+        
+        .sidebar-icon {
+            margin-right: 24px;
+            font-size: 1.2rem;
+            min-width: 24px;
+            text-align: center;
+        }
+        
+        body.collapsed-sidebar .sidebar-icon {
+            margin-right: 0;
+        }
+        
+        .sidebar-section-title {
+            padding: 8px 24px;
+            font-size: 0.9rem;
+            color: var(--yt-text-secondary);
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+        
+        /* Video Player */
+        .video-column {
+            margin-left: var(--yt-sidebar-width);
+            flex-grow: 1;
+            padding: 24px;
+            transition: margin-left 0.2s;
+        }
+        
+        body.collapsed-sidebar .video-column {
+            margin-left: var(--yt-sidebar-collapsed-width);
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: #000;
+            border-radius: 12px;
+        }
+        
+        .video-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* Player Controls */
+        .player-controls {
+            background-color: var(--yt-light-dark);
+            padding: 12px 16px;
+            border-radius: 0 0 12px 12px;
+            margin-top: -4px;
+        }
+        
+        .progress-container {
+            height: 4px;
+            background-color: #4d4d4d;
+            margin-bottom: 12px;
+            cursor: pointer;
+            border-radius: 2px;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--yt-red);
+            border-radius: 2px;
+            position: relative;
+        }
+        
+        .progress-hover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            pointer-events: none;
+        }
+        
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .left-controls, .right-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .control-btn {
+            background: none;
+            border: none;
+            color: var(--yt-text-primary);
+            font-size: 1.2rem;
+            padding: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .time-display {
+            font-size: 0.9rem;
+            color: var(--yt-text-secondary);
+        }
+        
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s, width 0.2s;
+        }
+        
+        .volume-container:hover .volume-slider {
+            opacity: 1;
+            width: 100px;
+        }
+        
+        /* Video Info */
+        .video-info {
+            margin-top: 16px;
+        }
+        
+        .video-title {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .video-stats {
+            display: flex;
+            align-items: center;
+            color: var(--yt-text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+        
+        .video-stats span {
+            margin-right: 8px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #272727;
+            color: var(--yt-text-primary);
+            border: none;
+            border-radius: 18px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            height: 36px;
+        }
+        
+        .action-btn i {
+            font-size: 1.1rem;
+        }
+        
+        .action-btn:hover {
+            background-color: #3d3d3d;
+        }
+        
+        /* Channel Info */
+        .channel-info {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-top: 1px solid #3f3f3f;
+            border-bottom: 1px solid #3f3f3f;
+        }
+        
+        .channel-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #555;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+        
+        .channel-info-text {
+            flex-grow: 1;
+        }
+        
+        .channel-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+            cursor: pointer;
+        }
+        
+        .channel-subs {
+            font-size: 0.9rem;
+            color: var(--yt-text-secondary);
+        }
+        
+        .subscribe-btn {
+            background-color: var(--yt-text-primary);
+            color: var(--yt-dark);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 16px;
+            font-weight: 500;
+            cursor: pointer;
+            height: 36px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        
+        .subscribe-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .subscribe-btn.subscribed {
+            background-color: #303030;
+            color: var(--yt-text-primary);
+        }
+        
+        .bell-icon {
+            margin-left: 8px;
+            cursor: pointer;
+            color: var(--yt-text-secondary);
+        }
+        
+        /* Video Description */
+        .video-description {
+            background-color: var(--yt-light-dark);
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .description-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            color: var(--yt-text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .show-more-btn {
+            color: var(--yt-text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 8px;
+        }
+        
+        /* Comments Section */
+        .comments-section {
+            margin-top: 24px;
+        }
+        
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .comments-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .sort-comments {
+            background: none;
+            border: none;
+            color: var(--yt-text-secondary);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .comment-input {
+            display: flex;
+            margin-bottom: 24px;
+        }
+        
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #555;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+        
+        .comment-input-field {
+            flex-grow: 1;
+            border-bottom: 1px solid #3f3f3f;
+            padding-bottom: 8px;
+            color: var(--yt-text-primary);
+            background: transparent;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            outline: none;
+            font-size: 0.95rem;
+        }
+        
+        .comment {
+            display: flex;
+            margin-bottom: 16px;
+        }
+        
+        .comment-content {
+            flex-grow: 1;
+        }
+        
+        .comment-author {
+            font-weight: 500;
+            margin-bottom: 4px;
+            cursor: pointer;
+        }
+        
+        .comment-text {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .comment-actions {
+            display: flex;
+            align-items: center;
+            color: var(--yt-text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .comment-like, .comment-reply {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin-right: 16px;
+        }
+        
+        .comment-like i, .comment-reply i {
+            margin-right: 8px;
+        }
+        
+        /* Recommended Videos */
+        .recommended-videos {
+            width: 402px;
+            padding: 0 24px;
+        }
+        
+        .recommended-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .autoplay-toggle {
+            display: flex;
+            align-items: center;
+        }
+        
+        .autoplay-text {
+            font-size: 0.9rem;
+            margin-right: 8px;
+        }
+        
+        .video-card {
+            display: flex;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+        
+        .video-thumbnail {
+            width: 168px;
+            height: 94px;
+            background-color: #3f3f3f;
+            border-radius: 8px;
+            margin-right: 8px;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .video-duration {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.8);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .video-info-small {
+            flex-grow: 1;
+        }
+        
+        .video-title-small {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        
+        .channel-name-small {
+            font-size: 0.85rem;
+            color: var(--yt-text-secondary);
+            margin-bottom: 2px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .video-stats-small {
+            font-size: 0.85rem;
+            color: var(--yt-text-secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: var(--yt-dark);
+            padding: 24px;
+            border-top: 1px solid #303030;
+            margin-top: 40px;
+            margin-left: var(--yt-sidebar-width);
+            transition: margin-left 0.2s;
+        }
+        
+        body.collapsed-sidebar .footer {
+            margin-left: var(--yt-sidebar-collapsed-width);
+        }
+        
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .footer-link {
+            color: var(--yt-text-secondary);
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        .footer-copyright {
+            color: var(--yt-text-secondary);
+            font-size: 0.8rem;
+        }
+        
+        /* Theater Mode */
+        body.theater-mode .sidebar,
+        body.theater-mode .recommended-videos,
+        body.theater-mode .footer {
+            display: none;
+        }
+        
+        body.theater-mode .video-column {
+            margin-left: 0;
+            max-width: 100%;
+            padding: 24px 0 0 0;
+        }
+        
+        body.theater-mode .video-container {
+            border-radius: 0;
+        }
+        
+        body.theater-mode .player-controls {
+            border-radius: 0;
+        }
+        
+        /* Fullscreen Mode */
+        body.fullscreen-mode {
+            overflow: hidden;
+        }
+        
+        body.fullscreen-mode .header,
+        body.fullscreen-mode .sidebar,
+        body.fullscreen-mode .recommended-videos,
+        body.fullscreen-mode .video-info,
+        body.fullscreen-mode .footer {
+            display: none;
+        }
+        
+        body.fullscreen-mode .main-content {
+            margin-top: 0;
+        }
+        
+        body.fullscreen-mode .video-column {
+            margin-left: 0;
+            padding: 0;
+            height: 100vh;
+        }
+        
+        body.fullscreen-mode .video-container {
+            height: calc(100vh - 60px);
+            border-radius: 0;
+        }
+        
+        body.fullscreen-mode .player-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-radius: 0;
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background-color: rgba(96, 96, 96, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 1001;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1312px) {
+            .recommended-videos {
+                width: 360px;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .recommended-videos {
+                width: 320px;
+            }
+            
+            .video-thumbnail {
+                width: 140px;
+                height: 78px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .header-center {
+                margin: 0 16px;
+            }
+            
+            .video-column {
+                padding: 16px;
+            }
+            
+            .recommended-videos {
+                padding: 0 16px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 8px;
+            }
+            
+            .header-center {
+                margin: 0 8px;
+            }
+            
+            .search-button {
+                width: 48px;
+                padding: 8px;
+            }
+            
+            .voice-search {
+                margin-left: 4px;
+            }
+            
+            .header-right {
+                gap: 8px;
+            }
+            
+            .header-icon {
+                padding: 6px;
+            }
+            
+            .video-column {
+                padding: 8px;
+            }
+            
+            .recommended-videos {
+                padding: 0 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="menu-icon" id="menuToggle">
+                <i class="bi bi-list" style="font-size: 1.2rem;"></i>
+            </div>
+            <div class="logo-container">
+                <i class="bi bi-youtube logo-icon"></i>
+                <span class="logo-text">YouTube</span>
+            </div>
+        </div>
+        
+        <div class="header-center">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search">
+                <button class="search-button">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+            <button class="voice-search">
+                <i class="bi bi-mic"></i>
+            </button>
+        </div>
+        
+        <div class="header-right">
+            <i class="bi bi-camera-video header-icon" title="Create"></i>
+            <i class="bi bi-grid-3x3-gap header-icon" title="Apps"></i>
+            <i class="bi bi-bell header-icon" title="Notifications"></i>
+            <div class="user-avatar" title="Your channel"></div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-item active">
+                <i class="bi bi-house-door sidebar-icon"></i>
+                <span>Home</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-compass sidebar-icon"></i>
+                <span>Explore</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-collection-play sidebar-icon"></i>
+                <span>Subscriptions</span>
+            </div>
+            <hr style="border-color: #3f3f3f; margin: 12px 0;">
+            <div class="sidebar-item">
+                <i class="bi bi-collection sidebar-icon"></i>
+                <span>Library</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-clock-history sidebar-icon"></i>
+                <span>History</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-play-btn sidebar-icon"></i>
+                <span>Your videos</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-clock sidebar-icon"></i>
+                <span>Watch later</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="bi bi-hand-thumbs-up sidebar-icon"></i>
+                <span>Liked videos</span>
+            </div>
+            <hr style="border-color: #3f3f3f; margin: 12px 0;">
+            <div class="sidebar-section-title">
+                SUBSCRIPTIONS
+            </div>
+            <div class="sidebar-item">
+                <div class="channel-avatar" style="width: 24px; height: 24px; margin-right: 24px;"></div>
+                <span>Channel 1</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="channel-avatar" style="width: 24px; height: 24px; margin-right: 24px;"></div>
+                <span>Channel 2</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="channel-avatar" style="width: 24px; height: 24px; margin-right: 24px;"></div>
+                <span>Channel 3</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="channel-avatar" style="width: 24px; height: 24px; margin-right: 24px;"></div>
+                <span>Channel 4</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="channel-avatar" style="width: 24px; height: 24px; margin-right: 24px;"></div>
+                <span>Channel 5</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="channel-avatar" style="width: 24px; height: 24px; margin-right: 24px;"></div>
+                <span>Channel 6</span>
+            </div>
+        </nav>
+        
+        <!-- Video Column -->
+        <div class="video-column">
+            <!-- Video Player -->
+            <div class="video-container" id="videoContainer">
+                <iframe id="youtube-player" class="video-iframe"
+                    src="https://www.youtube.com/embed/08WiUcJmnZc?enablejsapi=1&controls=0&rel=0&modestbranding=1&si=12uDG1fh3d8Z_GCU"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen></iframe>
+            </div>
+            
+            <!-- Player Controls -->
+            <div class="player-controls" id="playerControls">
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                    <div class="progress-hover" id="progressHover"></div>
+                    <div class="tooltip" id="progressTooltip">0:00</div>
+                </div>
+                <div class="controls-row">
+                    <div class="left-controls">
+                        <button class="control-btn" id="playBtn" title="Play (k)">
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                        <button class="control-btn" id="volumeBtn" title="Mute (m)">
+                            <i class="bi bi-volume-up"></i>
+                        </button>
+                        <div class="volume-container">
+                            <input type="range" class="form-range volume-slider" id="volumeSlider" min="0" max="100" value="50">
+                        </div>
+                        <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+                    </div>
+                    <div class="right-controls">
+                        <button class="control-btn" id="qualityBtn" title="Settings">
+                            <i class="bi bi-gear"></i>
+                        </button>
+                        <button class="control-btn" id="theaterBtn" title="Theater mode (t)">
+                            <i class="bi bi-aspect-ratio"></i>
+                        </button>
+                        <button class="control-btn" id="fullscreenBtn" title="Full screen (f)">
+                            <i class="bi bi-fullscreen"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Video Info -->
+            <div class="video-info">
+                <h1 class="video-title">How to Build a YouTube Clone with HTML, CSS & JavaScript</h1>
+                <div class="video-stats">
+                    <span>1,245,678 views</span>
+                    <span>•</span>
+                    <span>Jun 15, 2023</span>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn">
+                        <i class="bi bi-hand-thumbs-up"></i>
+                        <span>124K</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="bi bi-hand-thumbs-down"></i>
+                        <span>Dislike</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="bi bi-share"></i>
+                        <span>Share</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Save</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                </div>
+                
+                <div class="channel-info">
+                    <div class="channel-avatar"></div>
+                    <div class="channel-info-text">
+                        <div class="channel-name">Web Dev Tutorials</div>
+                        <div class="channel-subs">1.2M subscribers</div>
+                    </div>
+                    <button class="subscribe-btn" id="subscribeBtn">SUBSCRIBE</button>
+                    <i class="bi bi-bell-fill bell-icon" id="bellIcon"></i>
+                </div>
+                
+                <div class="video-description">
+                    <div class="description-stats">
+                        <span>15,245 views</span>
+                        <span>Premiered Jun 15, 2023</span>
+                    </div>
+                    <p>In this tutorial, we'll build a YouTube clone using HTML, CSS, and JavaScript. We'll cover:</p>
+                    <ul>
+                        <li>Creating the responsive layout</li>
+                        <li>Implementing the video player with custom controls</li>
+                        <li>Building the sidebar with toggle functionality</li>
+                        <li>Adding recommended videos section</li>
+                        <li>Making it look like the real YouTube</li>
+                    </ul>
+                    <p>Check out the source code on GitHub: <a href="#" style="color: #3ea6ff;">github.com/example/youtube-clone</a></p>
+                    <div class="show-more-btn" id="showMoreBtn">SHOW MORE</div>
+                </div>
+                
+                <div class="comments-section">
+                    <div class="comments-header">
+                        <h4 class="comments-title">4,235 Comments</h4>
+                        <button class="sort-comments">
+                            <i class="bi bi-funnel" style="margin-right: 8px;"></i>
+                            <span>Sort by</span>
+                        </button>
+                    </div>
+                    
+                    <div class="comment-input">
+                        <div class="comment-avatar"></div>
+                        <input type="text" class="comment-input-field" placeholder="Add a comment...">
+                    </div>
+                    
+                    <div class="comment">
+                        <div class="comment-avatar"></div>
+                        <div class="comment-content">
+                            <div class="comment-author">John Doe</div>
+                            <div class="comment-text">This is a great tutorial! I've been looking for something like this for a while. The explanation is very clear and the end result looks amazing.</div>
+                            <div class="comment-actions">
+                                <div class="comment-like">
+                                    <i class="bi bi-hand-thumbs-up"></i>
+                                    <span>245</span>
+                                </div>
+                                <div class="comment-reply">
+                                    <i class="bi bi-hand-thumbs-down"></i>
+                                </div>
+                                <div class="comment-reply">
+                                    <span>REPLY</span>
+                                </div>
+                            </div>
+                            <div class="show-more-btn" style="font-size: 0.9rem;">View 12 replies</div>
+                        </div>
+                    </div>
+                    
+                    <div class="comment">
+                        <div class="comment-avatar"></div>
+                        <div class="comment-content">
+                            <div class="comment-author">Jane Smith</div>
+                            <div class="comment-text">How would you implement the dark/light mode toggle? That would be a great addition to this tutorial.</div>
+                            <div class="comment-actions">
+                                <div class="comment-like">
+                                    <i class="bi bi-hand-thumbs-up"></i>
+                                    <span>112</span>
+                                </div>
+                                <div class="comment-reply">
+                                    <i class="bi bi-hand-thumbs-down"></i>
+                                </div>
+                                <div class="comment-reply">
+                                    <span>REPLY</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recommended Videos -->
+        <div class="recommended-videos">
+            <div class="recommended-header">
+                <h5>Up next</h5>
+                <div class="autoplay-toggle">
+                    <span class="autoplay-text">Autoplay</span>
+                    <div class="form-check form-switch" style="margin: 0;">
+                        <input class="form-check-input" type="checkbox" id="autoplaySwitch" checked>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <div class="video-duration">12:34</div>
+                </div>
+                <div class="video-info-small">
+                    <div class="video-title-small">How to Build a YouTube Clone with HTML & CSS</div>
+                    <div class="channel-name-small">Web Dev Tutorials</div>
+                    <div class="video-stats-small">245K views • 3 months ago</div>
+                </div>
+            </div>
+            
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <div class="video-duration">8:45</div>
+                </div>
+                <div class="video-info-small">
+                    <div class="video-title-small">Modern CSS Techniques You Should Know in 2023</div>
+                    <div class="channel-name-small">CSS Masters</div>
+                    <div class="video-stats-small">512K views • 5 months ago</div>
+                </div>
+            </div>
+            
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <div class="video-duration">15:22</div>
+                </div>
+                <div class="video-info-small">
+                    <div class="video-title-small">Building a Responsive Navbar with Bootstrap 5</div>
+                    <div class="channel-name-small">UI Design Pro</div>
+                    <div class="video-stats-small">187K views • 2 weeks ago</div>
+                </div>
+            </div>
+            
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <div class="video-duration">22:10</div>
+                </div>
+                <div class="video-info-small">
+                    <div class="video-title-small">JavaScript ES6+ Features Every Developer Should Know</div>
+                    <div class="channel-name-small">JS Wizards</div>
+                    <div class="video-stats-small">321K views • 1 month ago</div>
+                </div>
+            </div>
+            
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <div class="video-duration">10:05</div>
+                </div>
+                <div class="video-info-small">
+                    <div class="video-title-small">Creating Custom Video Player Controls with JavaScript</div>
+                    <div class="channel-name-small">Frontend Masters</div>
+                    <div class="video-stats-small">156K views • 3 weeks ago</div>
+                </div>
+            </div>
+            
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <div class="video-duration">18:37</div>
+                </div>
+                <div class="video-info-small">
+                    <div class="video-title-small">Responsive Web Design Principles in 2023</div>
+                    <div class="channel-name-small">Design Code</div>
+                    <div class="video-stats-small">278K views • 2 months ago</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#" class="footer-link">About</a>
+            <a href="#" class="footer-link">Press</a>
+            <a href="#" class="footer-link">Copyright</a>
+            <a href="#" class="footer-link">Contact us</a>
+            <a href="#" class="footer-link">Creators</a>
+            <a href="#" class="footer-link">Advertise</a>
+            <a href="#" class="footer-link">Developers</a>
+        </div>
+        
+        <div class="footer-links">
+            <a href="#" class="footer-link">Terms</a>
+            <a href="#" class="footer-link">Privacy</a>
+            <a href="#" class="footer-link">Policy & Safety</a>
+            <a href="#" class="footer-link">How YouTube works</a>
+            <a href="#" class="footer-link">Test new features</a>
+        </div>
+        
+        <div class="footer-copyright">
+            © 2023 Google LLC
+        </div>
+    </footer>
+
+    <!-- YouTube IFrame API -->
+    <script>
+        // Global variables
+        var player;
+        var isPlaying = false;
+        var isMuted = false;
+        var currentVolume = 50;
+        var isTheaterMode = false;
+        var isFullscreen = false;
+        var updateInterval;
+        var isSubscribed = false;
+        var isSidebarCollapsed = false;
+        
+        // Inject YouTube API script
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        
+        // YouTube API ready callback
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange,
+                    'onError': onPlayerError
+                }
+            });
+        }
+        
+        // Player ready callback
+        function onPlayerReady(event) {
+            // Set initial volume
+            player.setVolume(currentVolume);
+            
+            // Set up event listeners
+            setupControls();
+            
+            // Start update timer
+            updateInterval = setInterval(updatePlayerState, 100);
+            
+            // Set up keyboard shortcuts
+            setupKeyboardShortcuts();
+        }
+        
+        // Player state change callback
+        function onPlayerStateChange(event) {
+            updatePlayButtonState(event.data);
+        }
+        
+        // Player error callback
+        function onPlayerError(event) {
+            console.error("YouTube Player Error:", event.data);
+        }
+        
+        // Update player state
+        function updatePlayerState() {
+            if (player && typeof player.getCurrentTime === 'function' && typeof player.getDuration === 'function') {
+                updateTimeDisplay();
+                updateProgressBar();
+            }
+        }
+        
+        // Format time (seconds to MM:SS)
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+        
+        // Update time display
+        function updateTimeDisplay() {
+            const currentTime = player.getCurrentTime();
+            const duration = player.getDuration();
+            document.getElementById('timeDisplay').textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+        }
+        
+        // Update progress bar
+        function updateProgressBar() {
+            const currentTime = player.getCurrentTime();
+            const duration = player.getDuration();
+            const progressPercent = (currentTime / duration) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+        }
+        
+        // Update play button state
+        function updatePlayButtonState(state) {
+            const playBtn = document.getElementById('playBtn');
+            
+            switch(state) {
+                case YT.PlayerState.PLAYING:
+                    isPlaying = true;
+                    playBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+                    break;
+                case YT.PlayerState.PAUSED:
+                case YT.PlayerState.ENDED:
+                    isPlaying = false;
+                    playBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+                    break;
+            }
+        }
+        
+        // Set up keyboard shortcuts
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                // Don't trigger if typing in an input field
+                if (e.target.tagName === 'INPUT') return;
+                
+                switch(e.key.toLowerCase()) {
+                    case 'k':
+                    case ' ':
+                        togglePlayPause();
+                        e.preventDefault();
+                        break;
+                    case 'm':
+                        toggleMute();
+                        e.preventDefault();
+                        break;
+                    case 'f':
+                        toggleFullscreen();
+                        e.preventDefault();
+                        break;
+                    case 't':
+                        toggleTheaterMode();
+                        e.preventDefault();
+                        break;
+                    case 'arrowleft':
+                    case 'j':
+                        seek(-5);
+                        e.preventDefault();
+                        break;
+                    case 'arrowright':
+                    case 'l':
+                        seek(5);
+                        e.preventDefault();
+                        break;
+                    case 'arrowup':
+                        adjustVolume(5);
+                        e.preventDefault();
+                        break;
+                    case 'arrowdown':
+                        adjustVolume(-5);
+                        e.preventDefault();
+                        break;
+                }
+            });
+        }
+        
+        // Toggle play/pause
+        function togglePlayPause() {
+            if (isPlaying) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        }
+        
+        // Toggle mute
+        function toggleMute() {
+            if (isMuted) {
+                player.unMute();
+                document.getElementById('volumeBtn').innerHTML = currentVolume < 50 ? '<i class="bi bi-volume-down"></i>' : '<i class="bi bi-volume-up"></i>';
+                document.getElementById('volumeSlider').value = currentVolume;
+                isMuted = false;
+            } else {
+                player.mute();
+                document.getElementById('volumeBtn').innerHTML = '<i class="bi bi-volume-mute"></i>';
+                document.getElementById('volumeSlider').value = 0;
+                isMuted = true;
+            }
+        }
+        
+        // Adjust volume
+        function adjustVolume(change) {
+            let newVolume = currentVolume + change;
+            newVolume = Math.max(0, Math.min(100, newVolume));
+            
+            currentVolume = newVolume;
+            player.setVolume(currentVolume);
+            document.getElementById('volumeSlider').value = currentVolume;
+            
+            if (currentVolume == 0) {
+                document.getElementById('volumeBtn').innerHTML = '<i class="bi bi-volume-mute"></i>';
+                isMuted = true;
+            } else {
+                document.getElementById('volumeBtn').innerHTML = currentVolume < 50 ? '<i class="bi bi-volume-down"></i>' : '<i class="bi bi-volume-up"></i>';
+                isMuted = false;
+            }
+        }
+        
+        // Seek in video
+        function seek(seconds) {
+            const currentTime = player.getCurrentTime();
+            const duration = player.getDuration();
+            let newTime = currentTime + seconds;
+            newTime = Math.max(0, Math.min(duration, newTime));
+            player.seekTo(newTime, true);
+        }
+        
+        // Toggle theater mode
+        function toggleTheaterMode() {
+            isTheaterMode = !isTheaterMode;
+            document.body.classList.toggle('theater-mode', isTheaterMode);
+            
+            const theaterBtn = document.getElementById('theaterBtn');
+            if (isTheaterMode) {
+                theaterBtn.innerHTML = '<i class="bi bi-aspect-ratio"></i>';
+                theaterBtn.title = 'Default view (t)';
+            } else {
+                theaterBtn.innerHTML = '<i class="bi bi-aspect-ratio"></i>';
+                theaterBtn.title = 'Theater mode (t)';
+            }
+        }
+        
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            const videoContainer = document.getElementById('videoContainer');
+            
+            if (!isFullscreen) {
+                if (videoContainer.requestFullscreen) {
+                    videoContainer.requestFullscreen();
+                } else if (videoContainer.webkitRequestFullscreen) {
+                    videoContainer.webkitRequestFullscreen();
+                } else if (videoContainer.msRequestFullscreen) {
+                    videoContainer.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+        
+        // Toggle sidebar
+        function toggleSidebar() {
+            isSidebarCollapsed = !isSidebarCollapsed;
+            document.body.classList.toggle('collapsed-sidebar', isSidebarCollapsed);
+        }
+        
+        // Toggle subscribe
+        function toggleSubscribe() {
+            isSubscribed = !isSubscribed;
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            const bellIcon = document.getElementById('bellIcon');
+            
+            if (isSubscribed) {
+                subscribeBtn.textContent = 'SUBSCRIBED';
+                subscribeBtn.classList.add('subscribed');
+                bellIcon.classList.remove('bi-bell');
+                bellIcon.classList.add('bi-bell-fill');
+            } else {
+                subscribeBtn.textContent = 'SUBSCRIBE';
+                subscribeBtn.classList.remove('subscribed');
+                bellIcon.classList.add('bi-bell');
+                bellIcon.classList.remove('bi-bell-fill');
+            }
+        }
+        
+        // Set up control event listeners
+        function setupControls() {
+            const playBtn = document.getElementById('playBtn');
+            const volumeBtn = document.getElementById('volumeBtn');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const theaterBtn = document.getElementById('theaterBtn');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const videoContainer = document.getElementById('videoContainer');
+            const progressHover = document.getElementById('progressHover');
+            const progressTooltip = document.getElementById('progressTooltip');
+            const menuToggle = document.getElementById('menuToggle');
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            const bellIcon = document.getElementById('bellIcon');
+            const showMoreBtn = document.getElementById('showMoreBtn');
+            
+            // Play/Pause button
+            playBtn.addEventListener('click', togglePlayPause);
+            
+            // Volume control
+            volumeSlider.addEventListener('input', function() {
+                currentVolume = this.value;
+                player.setVolume(currentVolume);
+                
+                if (currentVolume == 0) {
+                    volumeBtn.innerHTML = '<i class="bi bi-volume-mute"></i>';
+                    isMuted = true;
+                } else {
+                    volumeBtn.innerHTML = currentVolume < 50 ? '<i class="bi bi-volume-down"></i>' : '<i class="bi bi-volume-up"></i>';
+                    isMuted = false;
+                }
+            });
+            
+            // Mute toggle
+            volumeBtn.addEventListener('click', toggleMute);
+            
+            // Theater mode
+            theaterBtn.addEventListener('click', toggleTheaterMode);
+            
+            // Fullscreen mode
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            
+            // Progress bar seeking
+            progressContainer.addEventListener('click', function(e) {
+                if (player && typeof player.getDuration === 'function') {
+                    const rect = this.getBoundingClientRect();
+                    const pos = (e.clientX - rect.left) / rect.width;
+                    const duration = player.getDuration();
+                    player.seekTo(duration * pos, true);
+                }
+            });
+            
+            // Progress bar hover
+            progressContainer.addEventListener('mousemove', function(e) {
+                if (player && typeof player.getDuration === 'function') {
+                    const rect = this.getBoundingClientRect();
+                    const pos = (e.clientX - rect.left) / rect.width;
+                    const duration = player.getDuration();
+                    const hoverTime = duration * pos;
+                    
+                    progressHover.style.width = `${pos * 100}%`;
+                    progressTooltip.textContent = formatTime(hoverTime);
+                    progressTooltip.style.left = `${e.clientX - rect.left}px`;
+                    progressTooltip.style.opacity = '1';
+                }
+            });
+            
+            progressContainer.addEventListener('mouseleave', function() {
+                progressTooltip.style.opacity = '0';
+            });
+            
+            // Handle fullscreen change events
+            document.addEventListener('fullscreenchange', function() {
+                isFullscreen = !!document.fullscreenElement;
+                fullscreenBtn.innerHTML = isFullscreen ? '<i class="bi bi-fullscreen-exit"></i>' : '<i class="bi bi-fullscreen"></i>';
+                fullscreenBtn.title = isFullscreen ? 'Exit full screen (f)' : 'Full screen (f)';
+            });
+            
+            document.addEventListener('webkitfullscreenchange', function() {
+                isFullscreen = !!document.webkitFullscreenElement;
+                fullscreenBtn.innerHTML = isFullscreen ? '<i class="bi bi-fullscreen-exit"></i>' : '<i class="bi bi-fullscreen"></i>';
+                fullscreenBtn.title = isFullscreen ? 'Exit full screen (f)' : 'Full screen (f)';
+            });
+            
+            // Menu toggle
+            menuToggle.addEventListener('click', toggleSidebar);
+            
+            // Subscribe button
+            subscribeBtn.addEventListener('click', toggleSubscribe);
+            
+            // Bell icon
+            bellIcon.addEventListener('click', function() {
+                if (isSubscribed) {
+                    bellIcon.classList.toggle('bi-bell-fill');
+                    bellIcon.classList.toggle('bi-bell');
+                }
+            });
+            
+            // Show more button
+            showMoreBtn.addEventListener('click', function() {
+                const description = document.querySelector('.video-description');
+                if (description.style.maxHeight) {
+                    description.style.maxHeight = null;
+                    showMoreBtn.textContent = 'SHOW MORE';
+                } else {
+                    description.style.maxHeight = 'none';
+                    showMoreBtn.textContent = 'SHOW LESS';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
